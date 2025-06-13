@@ -12,7 +12,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
     patientHandler := handler.NewPatientHandler(db)
     doctorHandler := handler.NewDoctorHandler(db)
 
-    r.POST("/login", handler.LoginHandler)
+    r.POST("/login", handler.LoginHandler(db))
 
     auth := r.Group("/api")
     auth.Use(middleware.AuthMiddleware())

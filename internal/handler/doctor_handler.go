@@ -53,6 +53,7 @@ func (h *DoctorHandler) UpdatePatient(c *gin.Context) {
 	existing.Name = input.Name
 	existing.Age = input.Age
 	existing.Address = input.Address
+	existing.Prescription = input.Prescription
 
 	if err := h.DB.Save(&existing).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update patient"})
