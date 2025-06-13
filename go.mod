@@ -1,4 +1,4 @@
-module cmd/main.go
+module myclinic
 
 go 1.23.10
 

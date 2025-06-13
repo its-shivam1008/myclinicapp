@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"cmd/main.go/internal/models"
+	"myclinic/internal/models"
 	"gorm.io/gorm"
 )
 

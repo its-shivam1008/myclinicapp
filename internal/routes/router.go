@@ -1,8 +1,8 @@
 package routes
 
 import (
-    "cmd/main.go/internal/handler"
-    "cmd/main.go/internal/middleware"
+    "myclinic/internal/handler"
+    "myclinic/internal/middleware"
 
     "github.com/gin-gonic/gin"
     "gorm.io/gorm"
