@@ -1,11 +1,13 @@
 package database
 
 import (
+	"log"
+	"myclinic/internal/models"
+	"os"
+
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"os"
-	"github.com/joho/godotenv"
 )
 
 func LoadEnv() {
@@ -21,6 +23,10 @@ func InitDB() *gorm.DB {
 		log.Fatal("Failed to connect to database:", err)
 	}else{
 		log.Println("Connected to database")
+	}
+
+	if err := db.AutoMigrate(&models.User{}, &models.Patient{}); err != nil {
+		log.Fatal("Migration failed:", err)
 	}
 	return db
 }

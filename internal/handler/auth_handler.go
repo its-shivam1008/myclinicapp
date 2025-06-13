@@ -2,49 +2,69 @@ package handler
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"myclinic/internal/models"
+	"gorm.io/gorm"
+	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtKey = []byte("your_secret_key")
+var DB *gorm.DB
 
-type Credentials struct {
+type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-}
-
-type Claims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
+	Role     string `json:"role"` // doctor or receptionist
 }
 
 func LoginHandler(c *gin.Context) {
-	var creds Credentials
-	if err := c.ShouldBindJSON(&creds); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	if creds.Username != "admin" || creds.Password != "password" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
+	var user models.User
+	err := DB.Where("username = ?", req.Username).First(&user).Error
+
+	if err != nil && err == gorm.ErrRecordNotFound {
+		// Registering new user
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		user = models.User{
+			Username: req.Username,
+			Password: string(hashedPassword),
+			Role:     req.Role,
+		}
+		if err := DB.Create(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
+		}
+	} else {
+		// Loggin existing user
+		if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)) != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect password"})
+			return
+		}
 	}
 
-	expirationTime := time.Now().Add(24 * time.Hour)
-	claims := &Claims{
-		Username: creds.Username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	// Generating JWT
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,
+		"username": user.Username,
+		"role": user.Role,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{
+		"token": tokenString,
+	})
 }

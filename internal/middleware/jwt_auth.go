@@ -1,16 +1,19 @@
 package middleware
 
 import (
+	"myclinic/internal/database"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("your_secret_key")
 
 func AuthMiddleware() gin.HandlerFunc {
+	database.LoadEnv()
+	jwtKey := os.Getenv("JWT_SECRET")
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
