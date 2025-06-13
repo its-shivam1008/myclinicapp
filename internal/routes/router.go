@@ -22,8 +22,8 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
         auth.PUT("/patients/:id", patientHandler.UpdatePatient)
         auth.DELETE("/patients/:id", patientHandler.DeletePatient)
 
-        auth.GET("/doctor/patients", doctorHandler.GetAllPatients)
-		auth.GET("/doctor/patients/:id", doctorHandler.GetPatientByID)
-		auth.PUT("/doctor/patients/:id", doctorHandler.UpdatePatient)
+        auth.GET("/doctor/patients", doctorHandler.GetAllPatientsForDoctor)
+		auth.GET("/doctor/patients/:id", doctorHandler.GetPatientByIDForDoctor)
+		auth.PUT("/doctor/patients/:id", doctorHandler.UpdatePatientForDoctor)
     }
 }

@@ -18,7 +18,22 @@ type LoginRequest struct {
 	Role     string `json:"role"` // doctor or receptionist
 }
 
-// Exported function that returns a gin handler with injected DB
+// @title MyClinic API
+// @version 1.0
+// @description API for managing patients and user authentication.
+// @host localhost:8080
+// @BasePath /
+// LoginHandler godoc
+// @Summary Login or Register
+// @Description Logs in an existing user or registers a new one
+// @Tags Auth
+// @Accept  json
+// @Produce  json
+// @Param   request body LoginRequest true "Login Request"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /login [post]
 func LoginHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req LoginRequest

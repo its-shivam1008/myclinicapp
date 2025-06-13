@@ -1,0 +1,265 @@
+basePath: /
+definitions:
+  handler.LoginRequest:
+    properties:
+      password:
+        type: string
+      role:
+        description: doctor or receptionist
+        type: string
+      username:
+        type: string
+    type: object
+  models.Patient:
+    properties:
+      address:
+        type: string
+      age:
+        type: integer
+      createdBy:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      prescription:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API documentation for Receptionist & Doctor portal
+  title: My Clinic API
+  version: "1.0"
+paths:
+  /doctor/patients:
+    get:
+      description: API for managing patients and user authentication.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Patient'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all patients (Doctor access)
+      tags:
+      - Doctor
+  /doctor/patients/{id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated info
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/models.Patient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Patient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Doctor updates patient info
+      tags:
+      - Doctor
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        API for managing patients and user authentication.
+        Logs in an existing user or registers a new one
+      parameters:
+      - description: Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login or Register
+      tags:
+      - Auth
+  /patients:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Patient'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all patients
+      tags:
+      - Patients
+    post:
+      consumes:
+      - application/json
+      description: API for managing patients and user authentication.
+      parameters:
+      - description: Patient Info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Patient'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Patient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new patient
+      tags:
+      - Patients
+  /patients/{id}:
+    delete:
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a patient
+      tags:
+      - Patients
+    get:
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Patient'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get patient by ID
+      tags:
+      - Patients
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Patient object
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/models.Patient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Patient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a patient
+      tags:
+      - Patients
+swagger: "2.0"
